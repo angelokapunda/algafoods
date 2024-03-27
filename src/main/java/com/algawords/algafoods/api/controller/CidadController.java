@@ -1,0 +1,70 @@
+package com.algawords.algafoods.api.controller;
+
+import com.algawords.algafoods.domain.exception.EstadoNaoEncontradoException;
+import com.algawords.algafoods.domain.exception.NegocioException;
+import com.algawords.algafoods.domain.modelo.Cidade;
+import com.algawords.algafoods.domain.service.CadastroCidadesService;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/cidades")
+public class CidadController {
+
+
+    @Autowired
+    private CadastroCidadesService cadastroCidades;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cidade adicionar(@RequestBody @Valid Cidade cidade) {
+        try {
+            return cadastroCidades.cadastro(cidade);
+        } catch (EstadoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
+
+    }
+
+    @GetMapping
+    public List<Cidade> listar() {
+        return cadastroCidades.listar();
+    }
+
+    @GetMapping("/{id}")
+    public Cidade buscar(@PathVariable Long id) {
+        return cadastroCidades.buscarOuFalhar(id);
+    }
+
+    @PutMapping("/{id}")
+    public Cidade actualizar(@PathVariable Long id, @RequestBody Cidade cidade) {
+        Cidade cidadeActual = cadastroCidades.buscarOuFalhar(id);
+        BeanUtils.copyProperties(cidade, cidadeActual, "id");
+        try {
+            return cadastroCidades.cadastro(cidadeActual);
+        } catch (EstadoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remover(@PathVariable Long id) {
+        cadastroCidades.remove(id);
+    }
+
+
+}
