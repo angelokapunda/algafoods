@@ -22,14 +22,19 @@ public class CadastroCozinhaService {
     }
 
     public void excluir(Long cozinhaId) {
-        try {
-            cozinhaRepository.deleteById(cozinhaId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new CozinhaNaoEncontradaException(cozinhaId);
+        Cozinha cozinha = new Cozinha();
+        cozinha = buscarOuFalhar(cozinhaId);
 
-        } catch (DataIntegrityViolationException e) {
-            throw new EntidadeEmUsoException(
-                    String.format(MSG_COZINHA_EM_USO, cozinhaId));
+        if (cozinha != null) {
+            try {
+                cozinhaRepository.deleteById(cozinhaId);
+            } catch (EmptyResultDataAccessException e) {
+                throw new CozinhaNaoEncontradaException(cozinhaId);
+
+            } catch (DataIntegrityViolationException e) {
+                throw new EntidadeEmUsoException(
+                        String.format(MSG_COZINHA_EM_USO, cozinhaId));
+            }
         }
     }
 
