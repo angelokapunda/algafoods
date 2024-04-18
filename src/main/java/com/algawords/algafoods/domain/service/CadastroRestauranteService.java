@@ -8,6 +8,7 @@ import com.algawords.algafoods.domain.repository.CozinhaRepository;
 import com.algawords.algafoods.domain.repository.RestauranteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.util.List;
@@ -32,6 +33,7 @@ public class CadastroRestauranteService {
         return restauranteRepository.findById(id).orElseThrow(() -> new RestauranteNaoEncontradoException(id));
     }
 
+    @Transactional
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
         Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
@@ -39,6 +41,7 @@ public class CadastroRestauranteService {
         return restauranteRepository.save(restaurante);
     }
 
+    @Transactional
     public void remover(Long id){
         try{
             restauranteRepository.deleteById(id);

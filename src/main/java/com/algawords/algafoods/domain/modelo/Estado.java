@@ -1,6 +1,6 @@
 package com.algawords.algafoods.domain.modelo;
 
-import com.algawords.algafoods.Groups;
+import com.algawords.algafoods.core.validation.Groups;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

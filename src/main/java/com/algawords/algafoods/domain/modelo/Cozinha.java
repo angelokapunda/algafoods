@@ -1,6 +1,6 @@
 package com.algawords.algafoods.domain.modelo;
 
-import com.algawords.algafoods.Groups;
+import com.algawords.algafoods.core.validation.Groups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +29,6 @@ public class Cozinha {
     @NotBlank
     private String nome;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "cozinha")
     private List<Restaurante> restaurantes = new ArrayList<>();
 
