@@ -46,6 +46,7 @@ public class CadastroCidadesService {
     public void remove(Long id) {
         try {
             cidadeRepository.deleteById(id);
+            cidadeRepository.flush();
 
         } catch (EmptyResultDataAccessException e) {
             throw new CidadeNaoEncontradoException(id);
