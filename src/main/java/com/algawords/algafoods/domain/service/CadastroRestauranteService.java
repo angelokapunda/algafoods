@@ -40,7 +40,6 @@ public class CadastroRestauranteService {
         restaurante.setCozinha(cozinha);
         return restauranteRepository.save(restaurante);
     }
-
     @Transactional
     public void remover(Long id){
         try{
