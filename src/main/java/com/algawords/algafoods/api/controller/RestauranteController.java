@@ -1,8 +1,14 @@
 package com.algawords.algafoods.api.controller;
 
+import com.algawords.algafoods.api.assemble.RestauranteInputDesassemble;
+import com.algawords.algafoods.api.assemble.RestauranteModelAssemble;
+import com.algawords.algafoods.api.modelo.CozinhaModel;
+import com.algawords.algafoods.api.modelo.RestauranteModel;
+import com.algawords.algafoods.api.modelo.input.RestauranteInput;
 import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.NegocioException;
+import com.algawords.algafoods.domain.modelo.Cozinha;
 import com.algawords.algafoods.domain.modelo.Restaurante;
 import com.algawords.algafoods.domain.repository.RestauranteRepository;
 import com.algawords.algafoods.domain.service.CadastroRestauranteService;
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -31,21 +38,29 @@ public class RestauranteController {
     @Autowired
     private RestauranteRepository restauranteRepository;
 
+    @Autowired
+    private RestauranteModelAssemble restauranteModelAssemble;
+
+    @Autowired
+    private RestauranteInputDesassemble restauranteInputDesassemble;
+
     @GetMapping
-    public List<Restaurante> lista () {
-       return cadastroRestaurante.listar();
+    public List<RestauranteModel> lista () {
+       return restauranteModelAssemble.toCollectionModel(cadastroRestaurante.listar());
     }
 
     @GetMapping("/{id}")
-    public Restaurante busca(@PathVariable Long id) {
-        return cadastroRestaurante.buscarOuFalhar(id);
+    public RestauranteModel busca(@PathVariable Long id) {
+        Restaurante restaurante =  cadastroRestaurante.buscarOuFalhar(id);
+        return restauranteModelAssemble.toModel(restaurante);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar (@RequestBody @Valid Restaurante restaurante) {
+    public RestauranteModel adicionar (@RequestBody @Valid RestauranteInput restauranteInput) {
         try {
-            return cadastroRestaurante.salvar(restaurante);
+            Restaurante restaurante = restauranteInputDesassemble.toDomainObject(restauranteInput);
+            return restauranteModelAssemble.toModel(cadastroRestaurante.salvar(restaurante));
         } catch (EntidadeNaoEncontradaException e) {
             throw new EntidadeEmUsoException(e.getMessage());
         }
@@ -53,12 +68,16 @@ public class RestauranteController {
     }
 
     @PutMapping("/{id}")
-    public Restaurante actualizar(@PathVariable Long id, @RequestBody @Valid Restaurante restaurante) {
+    public RestauranteModel actualizar(@PathVariable Long id, @RequestBody @Valid RestauranteInput restauranteInput) {
+//        Restaurante restaurante = restauranteInputDesassemble.toDomainObject(restauranteInput);
+
         Restaurante restauranteActual = cadastroRestaurante.buscarOuFalhar(id);
-        BeanUtils.copyProperties(restaurante, restauranteActual,
-                "id", "formasPagamento", "dataCadastro", "produto");
+        restauranteInputDesassemble.copyToDomainObject(restauranteInput, restauranteActual);
+
+//        BeanUtils.copyProperties(restaurante, restauranteActual,
+//                "id", "formasPagamento", "dataCadastro", "produto");
         try {
-            return cadastroRestaurante.salvar(restauranteActual);
+            return restauranteModelAssemble.toModel(cadastroRestaurante.salvar(restauranteActual));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
@@ -72,9 +91,6 @@ public class RestauranteController {
         cadastroRestaurante.remover(id);
 
     }
-
-
-
 
 
 }

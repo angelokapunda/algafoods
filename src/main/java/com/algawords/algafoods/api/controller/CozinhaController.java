@@ -1,15 +1,15 @@
 package com.algawords.algafoods.api.controller;
 
-import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
-import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
+import com.algawords.algafoods.api.assemble.CozinhaAssemble;
+import com.algawords.algafoods.api.assemble.CozinhaInputDesassemble;
+import com.algawords.algafoods.api.modelo.CozinhaModel;
+import com.algawords.algafoods.api.modelo.input.CozinhaInput;
 import com.algawords.algafoods.domain.modelo.Cozinha;
 import com.algawords.algafoods.domain.repository.CozinhaRepository;
 import com.algawords.algafoods.domain.service.CadastroCozinhaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cozinhas")
@@ -34,28 +32,36 @@ public class CozinhaController {
     @Autowired
     private CadastroCozinhaService cadastroCozinha;
 
+    @Autowired
+    CozinhaAssemble cozinhaAssemble;
+
+    @Autowired
+    private CozinhaInputDesassemble cozinhaInputDesassemble;
+
     @GetMapping
-    public List<Cozinha> lista() {
-        return cozinhaRepository.findAll();
+    public List<CozinhaModel> lista() {
+        return cozinhaAssemble.ListToModel(cozinhaRepository.findAll());
     }
 
-
     @GetMapping("/{id}")
-    public Cozinha buscar(@PathVariable Long id) {
-        return cadastroCozinha.buscarOuFalhar(id);
+    public CozinhaModel buscar(@PathVariable Long id) {
+        return cozinhaAssemble.toModel(cadastroCozinha.buscarOuFalhar(id));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cozinha adicionar (@RequestBody @Valid Cozinha cozinha) {
-        return  cadastroCozinha.salvar(cozinha);
+    public CozinhaModel adicionar (@RequestBody @Valid CozinhaInput cozinhaInput) {
+        Cozinha cozinha = cozinhaInputDesassemble.toDomainObject(cozinhaInput);
+        return  cozinhaAssemble.toModel(cadastroCozinha.salvar(cozinha));
     }
 
     @PutMapping("/{id}")
-    public Cozinha actualizar(@PathVariable Long id, @Valid @RequestBody Cozinha cozinha) {
+    public CozinhaModel actualizar(@PathVariable Long id, @Valid @RequestBody CozinhaInput cozinhaInput) {
+
         Cozinha cozinhaActual = cadastroCozinha.buscarOuFalhar(id);
-        BeanUtils.copyProperties(cozinha, cozinhaActual, "id");
-        return cadastroCozinha.salvar(cozinhaActual);
+        cozinhaInputDesassemble.copyToDomainObject(cozinhaInput, cozinhaActual);
+
+        return cozinhaAssemble.toModel(cadastroCozinha.salvar(cozinhaActual));
     }
 
     @DeleteMapping("/{id}")
@@ -63,6 +69,8 @@ public class CozinhaController {
     public void remover(@PathVariable Long id) {
         cadastroCozinha.excluir(id);
     }
+
+
 
 }
 
