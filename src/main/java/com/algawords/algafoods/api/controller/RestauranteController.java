@@ -69,27 +69,32 @@ public class RestauranteController {
 
     @PutMapping("/{id}")
     public RestauranteModel actualizar(@PathVariable Long id, @RequestBody @Valid RestauranteInput restauranteInput) {
-//        Restaurante restaurante = restauranteInputDesassemble.toDomainObject(restauranteInput);
-
         Restaurante restauranteActual = cadastroRestaurante.buscarOuFalhar(id);
         restauranteInputDesassemble.copyToDomainObject(restauranteInput, restauranteActual);
 
-//        BeanUtils.copyProperties(restaurante, restauranteActual,
-//                "id", "formasPagamento", "dataCadastro", "produto");
         try {
             return restauranteModelAssemble.toModel(cadastroRestaurante.salvar(restauranteActual));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
-
-
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long id) {
         cadastroRestaurante.remover(id);
+    }
 
+    @PutMapping("/{restauranteId}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ativo (@PathVariable Long restauranteId) {
+        cadastroRestaurante.ativar(restauranteId);
+    }
+
+    @DeleteMapping("/{restauranteId}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void inativo (@PathVariable Long restauranteId) {
+        cadastroRestaurante.inativar(restauranteId);
     }
 
 

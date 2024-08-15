@@ -49,4 +49,16 @@ public class CadastroRestauranteService {
             e.getMessage();
         }
     }
+
+    @Transactional
+    public void ativar(Long restauranteId) {
+        Restaurante restauranteActual = buscarOuFalhar(restauranteId);
+        restauranteActual.ativar();
+    }
+
+    @Transactional
+    public void inativar(Long restauranteId) {
+        Restaurante restauranteActual = buscarOuFalhar(restauranteId);
+        restauranteActual.inativar();
+    }
 }
