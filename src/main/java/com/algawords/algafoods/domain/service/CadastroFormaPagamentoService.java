@@ -19,8 +19,6 @@ public class CadastroFormaPagamentoService {
 
     private static final String MSG_FORMA_PAGAMENTO_EM_USO = "A forma de pagamento de código %d não pode ser excluida, pós está em uso. ";
 
-
-
     @Autowired
     private FormaPagamentoRepository formaPagamentoRepository;
 
@@ -42,6 +40,7 @@ public class CadastroFormaPagamentoService {
     public void excluir (Long id) {
         try {
             formaPagamentoRepository.deleteById(id);
+            formaPagamentoRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(String.format(MSG_FORMA_PAGAMENTO_EM_USO, id));
         } catch (EmptyResultDataAccessException e) {
