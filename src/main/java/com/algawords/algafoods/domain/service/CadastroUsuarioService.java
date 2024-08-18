@@ -1,0 +1,53 @@
+package com.algawords.algafoods.domain.service;
+
+import com.algawords.algafoods.domain.exception.NegocioException;
+import com.algawords.algafoods.domain.exception.UsuarioEmUsoException;
+import com.algawords.algafoods.domain.exception.UsuarioNaoEncontradoException;
+import com.algawords.algafoods.domain.modelo.Usuario;
+import com.algawords.algafoods.domain.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class CadastroUsuarioService {
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Transactional
+    public Usuario salvar(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    public List<Usuario> listar() {
+        return usuarioRepository.findAll();
+    }
+
+    public Usuario buscarOuFalhar(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+    }
+
+    @Transactional
+    public void alterarSenha(Long id, String senhaActual, String novaSenha) {
+        Usuario usuario = buscarOuFalhar(id);
+        if (usuario.senhaNaoCoincideCom(senhaActual)) {
+            throw  new NegocioException("Senha actual informada não conscide com a senha do usuário");
+        }
+        usuario.setSenha(novaSenha);
+    }
+
+    @Transactional
+    public void excluir (Long id) {
+        var usuario = buscarOuFalhar(id);
+        try {
+            usuarioRepository.delete(usuario);
+            usuarioRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new UsuarioEmUsoException(String.format("O usuario de código %d esta em uso.", id));
+        }
+    }
+}
