@@ -5,12 +5,14 @@ import com.algawords.algafoods.domain.exception.UsuarioEmUsoException;
 import com.algawords.algafoods.domain.exception.UsuarioNaoEncontradoException;
 import com.algawords.algafoods.domain.modelo.Usuario;
 import com.algawords.algafoods.domain.repository.UsuarioRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CadastroUsuarioService {
@@ -18,8 +20,19 @@ public class CadastroUsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private EntityManager manager;
+
     @Transactional
     public Usuario salvar(Usuario usuario) {
+        // Para papar de gerenciar o usuario evitando assim uma sicronizacao indesejada
+        manager.detach(usuario);
+
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuario.getEmail());
+        if (usuarioExistente.isPresent() && !usuarioExistente.get().equals(usuario)) {
+            throw new NegocioException(
+                    String.format("Já existe um usuário cadastrado com o email %s", usuario.getEmail()));
+        }
         return usuarioRepository.save(usuario);
     }
 
