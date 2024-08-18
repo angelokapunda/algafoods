@@ -2,6 +2,7 @@ package com.algawords.algafoods.domain.service;
 
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.RestauranteNaoEncontradoException;
+import com.algawords.algafoods.domain.modelo.Cidade;
 import com.algawords.algafoods.domain.modelo.Cozinha;
 import com.algawords.algafoods.domain.modelo.Restaurante;
 import com.algawords.algafoods.domain.repository.CozinhaRepository;
@@ -25,6 +26,9 @@ public class CadastroRestauranteService {
     @Autowired
     private CadastroCozinhaService cadastroCozinhaService;
 
+    @Autowired
+    private CadastroCidadesService cadastroCidade;
+
     public List<Restaurante> listar() {
         return restauranteRepository.findAll();
     }
@@ -36,8 +40,13 @@ public class CadastroRestauranteService {
     @Transactional
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
+        Long cidadeId = restaurante.getEndereco().getCidade().getId();
+
         Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
+        Cidade cidade = cadastroCidade.buscarOuFalhar(cidadeId);
+
         restaurante.setCozinha(cozinha);
+        restaurante.getEndereco().setCidade(cidade);
         return restauranteRepository.save(restaurante);
     }
     @Transactional

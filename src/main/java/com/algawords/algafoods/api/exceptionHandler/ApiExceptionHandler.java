@@ -4,6 +4,7 @@ import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.NegocioException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         Problem problem = createProblemBuilder(status, problemType, details)
                 .userMesseger(details)
                 .build();
-        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
     @Override
@@ -190,7 +191,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                             .name(fieldError.getField())
                             .userMessage(messege)
                             .build();
-                }).toList();
+                    }).toList();
 
         Problem problem = createProblemBuilder((HttpStatus) status, problemType,  detail)
                 .userMesseger(detail)
@@ -201,11 +202,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-
-
-
-    //    private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        String path = joinPath(ex.getPath());
+//        private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        //String path = joinPath(ex.getPath());
 //
 //        ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
 //        String details = String.format("A propriedade %s não existe corija ou remova essa propriedade e tente novamente.");

@@ -5,6 +5,8 @@ import com.algawords.algafoods.api.assemble.RestauranteModelAssemble;
 import com.algawords.algafoods.api.modelo.CozinhaModel;
 import com.algawords.algafoods.api.modelo.RestauranteModel;
 import com.algawords.algafoods.api.modelo.input.RestauranteInput;
+import com.algawords.algafoods.domain.exception.CidadeNaoEncontradoException;
+import com.algawords.algafoods.domain.exception.CozinhaNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.NegocioException;
@@ -61,10 +63,9 @@ public class RestauranteController {
         try {
             Restaurante restaurante = restauranteInputDesassemble.toDomainObject(restauranteInput);
             return restauranteModelAssemble.toModel(cadastroRestaurante.salvar(restaurante));
-        } catch (EntidadeNaoEncontradaException e) {
-            throw new EntidadeEmUsoException(e.getMessage());
+        } catch (CozinhaNaoEncontradaException | CidadeNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage()) ;
         }
-
     }
 
     @PutMapping("/{id}")
@@ -74,7 +75,7 @@ public class RestauranteController {
 
         try {
             return restauranteModelAssemble.toModel(cadastroRestaurante.salvar(restauranteActual));
-        } catch (EntidadeNaoEncontradaException e) {
+        } catch (CozinhaNaoEncontradaException | CidadeNaoEncontradoException e) {
             throw new NegocioException(e.getMessage());
         }
     }
