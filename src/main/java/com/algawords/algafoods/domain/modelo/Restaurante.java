@@ -55,6 +55,8 @@ public class Restaurante {
 
     private Boolean ativo = Boolean.TRUE;
 
+    private Boolean aberto;
+
     @CreationTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
     private OffsetDateTime dataCadastro;
@@ -77,6 +79,13 @@ public class Restaurante {
     }
     public void inativar() {
         this.ativo = false;
+    }
+
+    public void abertura() {
+        this.aberto = true;
+    }
+    public void fechamento() {
+        this.aberto = false;
     }
 
     public boolean desassociarFormaPaagamento (FormaPagamento formaPagamento) {

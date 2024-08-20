@@ -70,6 +70,24 @@ public class CadastroRestauranteService {
     }
 
     @Transactional
+    public void inativar(Long restauranteId) {
+        Restaurante restauranteActual = buscarOuFalhar(restauranteId);
+        restauranteActual.inativar();
+    }
+
+    @Transactional
+    public void abrirRestaurante (Long restauranteId) {
+        Restaurante restaurante = buscarOuFalhar(restauranteId);
+        restaurante.abertura();
+    }
+
+    @Transactional
+    public void fecharRestaurante(Long restauranteId) {
+        Restaurante restaurante = buscarOuFalhar(restauranteId);
+        restaurante.fechamento();
+    }
+
+    @Transactional
     public void desassociacaoFormaPagamento (Long restauranteId, Long formaPagamentoId) {
         Restaurante restaurante = buscarOuFalhar(restauranteId);
         FormaPagamento formaPagamento = cadastroFormaPagamento.buscarFalhar(formaPagamentoId);
@@ -81,11 +99,5 @@ public class CadastroRestauranteService {
         Restaurante restaurante = buscarOuFalhar(restauranteId);
         FormaPagamento formaPagamento = cadastroFormaPagamento.buscarFalhar(formaPagamentoId);
         restaurante.associarFormaPaagamento(formaPagamento);
-    }
-
-    @Transactional
-    public void inativar(Long restauranteId) {
-        Restaurante restauranteActual = buscarOuFalhar(restauranteId);
-        restauranteActual.inativar();
     }
 }
