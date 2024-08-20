@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Table(name = "produto")
+
 @Entity
 @EqualsAndHashCode(of = "id")
 @Data
@@ -40,7 +40,5 @@ public class Produto {
     private Boolean ativo;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    @JoinTable(name = "restaurante_id")
     private Restaurante restaurante;
 }
