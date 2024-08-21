@@ -6,6 +6,7 @@ import com.algawords.algafoods.domain.modelo.Cidade;
 import com.algawords.algafoods.domain.modelo.Cozinha;
 import com.algawords.algafoods.domain.modelo.FormaPagamento;
 import com.algawords.algafoods.domain.modelo.Restaurante;
+import com.algawords.algafoods.domain.modelo.Usuario;
 import com.algawords.algafoods.domain.repository.CozinhaRepository;
 import com.algawords.algafoods.domain.repository.RestauranteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class CadastroRestauranteService {
 
     @Autowired
     private CadastroCidadesService cadastroCidade;
+
+    @Autowired
+    CadastroUsuarioService cadastroUsuario;
 
     @Autowired
     private CadastroFormaPagamentoService cadastroFormaPagamento;
@@ -99,5 +103,19 @@ public class CadastroRestauranteService {
         Restaurante restaurante = buscarOuFalhar(restauranteId);
         FormaPagamento formaPagamento = cadastroFormaPagamento.buscarFalhar(formaPagamentoId);
         restaurante.associarFormaPaagamento(formaPagamento);
+    }
+
+    @Transactional
+    public void adicionarResponsavel(Long restauranteId, Long responsavelId) {
+        Restaurante restaurante = buscarOuFalhar(restauranteId);
+        Usuario responsavel = cadastroUsuario.buscarOuFalhar(responsavelId);
+        restaurante.associarResponsavel(responsavel);
+    }
+
+    @Transactional
+    public void removerResponsavel(Long restauranteId, Long responsavelId) {
+        Restaurante restaurante = buscarOuFalhar(restauranteId);
+        Usuario responsavel = cadastroUsuario.buscarOuFalhar(responsavelId);
+        restaurante.desassociarResponsavel(responsavel);
     }
 }

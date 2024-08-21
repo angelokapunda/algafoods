@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -65,14 +66,21 @@ public class Restaurante {
     @Column(nullable = false, columnDefinition = "datetime")
     private OffsetDateTime dataAtualizacao;
 
+    @OneToMany(mappedBy = "restaurante")
+    private List<Produto> produtos = new ArrayList<>();
+
     @ManyToMany
     @JoinTable(name = "restaurante_forma_pagamento",
             joinColumns = @JoinColumn(name = "restaurante_id"),
             inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
     private Set<FormaPagamento> formasPagamento = new HashSet<>();
 
-    @OneToMany(mappedBy = "restaurante")
-    private List<Produto> produtos = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(name = "restaurante_usuario_responsavel",
+    joinColumns = @JoinColumn(name = "restaurante_id"),
+    inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+    private Set<Usuario> responsavel = new HashSet<>();
+
 
     public void ativar() {
         this.ativo = true;
@@ -94,5 +102,13 @@ public class Restaurante {
 
     public boolean associarFormaPaagamento (FormaPagamento formaPagamento) {
         return getFormasPagamento().add(formaPagamento);
+    }
+
+    public boolean associarResponsavel (Usuario usuario) {
+        return getResponsavel().add(usuario);
+    }
+
+    public boolean desassociarResponsavel (Usuario usuario) {
+        return getResponsavel().remove(usuario);
     }
 }
