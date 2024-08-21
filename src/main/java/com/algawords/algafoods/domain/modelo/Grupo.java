@@ -7,15 +7,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -31,5 +27,12 @@ public class Grupo {
     @ManyToMany
     @JoinTable(name = "grupo_permissao", joinColumns = @JoinColumn(name = "grupo_id"),
     inverseJoinColumns = @JoinColumn(name = "permissao_id"))
-    private List<Permissao> permossoes = new ArrayList<>();
+    private Set<Permissao> permossoes = new HashSet<>();
+
+    public boolean adicionarPermissao(Permissao permissao) {
+        return getPermossoes().add(permissao);
+    }
+    public boolean removerPermissao (Permissao permissao) {
+        return getPermossoes().remove(permissao);
+    }
 }

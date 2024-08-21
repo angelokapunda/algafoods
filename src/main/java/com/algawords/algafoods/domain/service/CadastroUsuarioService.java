@@ -3,6 +3,7 @@ package com.algawords.algafoods.domain.service;
 import com.algawords.algafoods.domain.exception.NegocioException;
 import com.algawords.algafoods.domain.exception.UsuarioEmUsoException;
 import com.algawords.algafoods.domain.exception.UsuarioNaoEncontradoException;
+import com.algawords.algafoods.domain.modelo.Grupo;
 import com.algawords.algafoods.domain.modelo.Usuario;
 import com.algawords.algafoods.domain.repository.UsuarioRepository;
 import jakarta.persistence.EntityManager;
@@ -23,6 +24,9 @@ public class CadastroUsuarioService {
     @Autowired
     private EntityManager manager;
 
+    @Autowired
+    private CadastroGrupoService cadastroGrupo;
+
     @Transactional
     public Usuario salvar(Usuario usuario) {
         // Para papar de gerenciar o usuario evitando assim uma sicronizacao indesejada
@@ -42,6 +46,20 @@ public class CadastroUsuarioService {
 
     public Usuario buscarOuFalhar(Long id) {
         return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+    }
+
+    @Transactional
+    public void associarGrupo (Long grupoId, Long usuarioId) {
+        Usuario usuario = buscarOuFalhar(usuarioId);
+        Grupo grupo = cadastroGrupo.buscarOuFalhar(grupoId);
+        usuario.adicionarGrupos(grupo);
+    }
+
+    @Transactional
+    public void desassociarGrupo (Long grupoId, Long usuarioId) {
+        Usuario usuario = buscarOuFalhar(usuarioId);
+        Grupo grupo = cadastroGrupo.buscarOuFalhar(grupoId);
+        usuario.removerGrupos(grupo);
     }
 
     @Transactional

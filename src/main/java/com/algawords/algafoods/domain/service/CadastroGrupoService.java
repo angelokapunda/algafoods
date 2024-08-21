@@ -1,9 +1,9 @@
 package com.algawords.algafoods.domain.service;
 
 import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
-import com.algawords.algafoods.domain.exception.EstadoNaoEncontradoException;
 import com.algawords.algafoods.domain.exception.GrupoNaoEncontradoException;
 import com.algawords.algafoods.domain.modelo.Grupo;
+import com.algawords.algafoods.domain.modelo.Permissao;
 import com.algawords.algafoods.domain.repository.GrupoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +21,9 @@ public class CadastroGrupoService {
     @Autowired
     private GrupoRepository grupoRepository;
 
+    @Autowired
+    private CadastroPermissaoService cadastroPermissao;
+
     @Transactional
     public Grupo salvar(Grupo grupo) {
         return grupoRepository.save(grupo);
@@ -34,6 +37,20 @@ public class CadastroGrupoService {
         return grupoRepository.findById(id).orElseThrow(() -> new GrupoNaoEncontradoException(
                 String.format("Grupo de código %d não existe", id)
         ));
+    }
+
+    @Transactional
+    public void desassociacao (Long grupoId, Long permissaoId) {
+        Grupo grupo = buscarOuFalhar(grupoId);
+        Permissao permissao = cadastroPermissao.buscarOuFalhar(permissaoId);
+        grupo.removerPermissao(permissao);
+    }
+
+    @Transactional
+    public void associacao ( Long grupoId, Long permissaoId) {
+        Grupo grupo = buscarOuFalhar(grupoId);
+        Permissao permissao = cadastroPermissao.buscarOuFalhar(permissaoId);
+        grupo.adicionarPermissao(permissao);
     }
 
     @Transactional
