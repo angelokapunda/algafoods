@@ -104,14 +104,14 @@ public class CadastroRestauranteService {
     @Transactional
     public void desassociacaoFormaPagamento (Long restauranteId, Long formaPagamentoId) {
         Restaurante restaurante = buscarOuFalhar(restauranteId);
-        FormaPagamento formaPagamento = cadastroFormaPagamento.buscarFalhar(formaPagamentoId);
+        FormaPagamento formaPagamento = cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId);
         restaurante.desassociarFormaPaagamento(formaPagamento);
     }
 
     @Transactional
     public void associacaoFormaPagamento (Long restauranteId, Long formaPagamentoId) {
         Restaurante restaurante = buscarOuFalhar(restauranteId);
-        FormaPagamento formaPagamento = cadastroFormaPagamento.buscarFalhar(formaPagamentoId);
+        FormaPagamento formaPagamento = cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId);
         restaurante.associarFormaPaagamento(formaPagamento);
     }
 

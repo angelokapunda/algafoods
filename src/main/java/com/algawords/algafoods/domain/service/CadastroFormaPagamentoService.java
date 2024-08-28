@@ -1,6 +1,5 @@
 package com.algawords.algafoods.domain.service;
 
-import com.algawords.algafoods.api.modelo.FormaPagamentoModel;
 import com.algawords.algafoods.domain.exception.EntidadeEmUsoException;
 import com.algawords.algafoods.domain.exception.EstadoNaoEncontradoException;
 import com.algawords.algafoods.domain.exception.FormaPagamentoNaoEncontradaException;
@@ -31,7 +30,7 @@ public class CadastroFormaPagamentoService {
         return formaPagamentoRepository.findAll();
     }
 
-    public FormaPagamento buscarFalhar(Long id) {
+    public FormaPagamento buscarOuFalhar(Long id) {
         return formaPagamentoRepository.findById(id).orElseThrow(() ->
                 new FormaPagamentoNaoEncontradaException(id));
     }
