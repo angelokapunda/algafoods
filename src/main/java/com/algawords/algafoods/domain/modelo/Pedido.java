@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -30,6 +32,8 @@ public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String codigo;
 
     private BigDecimal subtotal;
     private BigDecimal taxaFrete;
@@ -87,10 +91,15 @@ public class Pedido {
     }
     private void setStatus(StatusPedido novoStatus) {
         if (getStatus().naoPodeAlterarPara(novoStatus)) {
-            throw new NegocioException(String.format("Status de pedido %d não pode ser alterado de %s para %s",
-                    getId(), getStatus().getDescricao(), novoStatus.getDescricao()));
+            throw new NegocioException(String.format("Status de pedido %s não pode ser alterado de %s para %s",
+                    getCodigo(), getStatus().getDescricao(), novoStatus.getDescricao()));
         }
         this.status = novoStatus;
+    }
+
+    @PrePersist
+    public void gerarCodigo() {
+        setCodigo(UUID.randomUUID().toString());
     }
 
     public void definirFrete() {

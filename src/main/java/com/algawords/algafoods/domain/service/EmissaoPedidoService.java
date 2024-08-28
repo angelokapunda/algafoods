@@ -84,14 +84,14 @@ public class EmissaoPedidoService {
         return pedidoRepository.findAll();
     }
 
-    public Pedido buscarOuFalhar(Long pedidoId) {
-        return pedidoRepository.findById(pedidoId).orElseThrow(
-                () -> new PedidoNaoEncontradoException(pedidoId));
+    public Pedido buscarOuFalhar(String codigoPedido) {
+        return pedidoRepository.findByCodigo(codigoPedido).orElseThrow(
+                () -> new PedidoNaoEncontradoException(codigoPedido));
     }
 
     @Transactional
-    public void excluir(Long pedidoId) {
-        Pedido pedido = buscarOuFalhar(pedidoId);
+    public void excluir(String codigoPedido) {
+        Pedido pedido = buscarOuFalhar(codigoPedido);
         pedidoRepository.delete(pedido);
     }
 }
