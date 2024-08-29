@@ -4,6 +4,7 @@ import com.algawords.algafoods.api.assemble.RestauranteInputDesassemble;
 import com.algawords.algafoods.api.assemble.RestauranteModelAssemble;
 import com.algawords.algafoods.api.modelo.RestauranteModel;
 import com.algawords.algafoods.api.modelo.input.RestauranteInput;
+import com.algawords.algafoods.api.modelo.view.RestauranteView;
 import com.algawords.algafoods.domain.exception.CidadeNaoEncontradoException;
 import com.algawords.algafoods.domain.exception.CozinhaNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
@@ -11,11 +12,14 @@ import com.algawords.algafoods.domain.exception.NegocioException;
 import com.algawords.algafoods.domain.modelo.Restaurante;
 import com.algawords.algafoods.domain.repository.RestauranteRepository;
 import com.algawords.algafoods.domain.service.CadastroRestauranteService;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,8 +46,15 @@ public class RestauranteController {
     private RestauranteInputDesassemble restauranteInputDesassemble;
 
     @GetMapping
+    @JsonView(RestauranteView.Rresumo.class)
     public List<RestauranteModel> lista () {
        return restauranteModelAssemble.toCollectionModel(cadastroRestaurante.listar());
+    }
+
+    @GetMapping(params = "projecao=apenas-nome")
+    @JsonView(RestauranteView.apenasNome.class)
+    public List<RestauranteModel> listaApenasNome () {
+        return lista();
     }
 
     @GetMapping("/{id}")
