@@ -15,8 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -24,6 +26,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -176,13 +179,22 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, headers, status, request);
     }
 
+//    Rever os parametros por causa do "ServletRequestBindingException"
+//    @Override
+//    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+//        return handleValidationInternal(ex, headers, status, request, ex.getMessage());
+//    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return handleValidationInternal(ex, headers, status, request, ex.getBindingResult());
+    }
 
+    private ResponseEntity<Object> handleValidationInternal(Exception ex, HttpHeaders headers, HttpStatusCode status,
+                                                            WebRequest request, BindingResult bindingResult) {
         ProblemType problemType = ProblemType.DADOS_INVALIDOS;
         String detail = "Um ou mais dados estão inválidos. Faça o preenchimento e tente novamente.";
 
-        BindingResult bindingResult = ex.getBindingResult();
         List<Problem.Field> problemFields = bindingResult.getFieldErrors().stream()
                 .map(fieldError -> {
                     String messege = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
@@ -191,7 +203,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                             .name(fieldError.getField())
                             .userMessage(messege)
                             .build();
-                    }).toList();
+                }).toList();
 
         Problem problem = createProblemBuilder((HttpStatus) status, problemType,  detail)
                 .userMesseger(detail)
@@ -199,7 +211,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return super.handleExceptionInternal(ex,problem, headers, status, request);
-
     }
 
 //        private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {

@@ -24,9 +24,13 @@ public class CadastroProdutoService {
         return produtoRepository.save(produto);
     }
 
-    public List<Produto> listar(Long restauranteId){
+    public List<Produto> listar(Long restauranteId, boolean incluirInativos){
         Restaurante restaurante = cadastroRestauranteService.buscarOuFalhar(restauranteId);
-        return restaurante.getProdutos();
+        if (incluirInativos) {
+            return produtoRepository.findByRestaurante(restaurante);
+        } else {
+            return produtoRepository.findAtivosByRestaurante(restaurante);
+        }
     }
 
     public Produto buscarOuFalhar(Long restauranteId, Long produtoId) {

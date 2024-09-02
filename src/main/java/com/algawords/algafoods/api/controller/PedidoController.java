@@ -11,7 +11,9 @@ import com.algawords.algafoods.domain.exception.NegocioException;
 import com.algawords.algafoods.domain.modelo.Pedido;
 import com.algawords.algafoods.domain.modelo.Usuario;
 import com.algawords.algafoods.domain.repository.PedidoRepository;
+import com.algawords.algafoods.domain.repository.filter.PedidoFilter;
 import com.algawords.algafoods.domain.service.EmissaoPedidoService;
+import com.algawords.algafoods.infra.repository.spec.PedidoSpecs;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,10 +46,13 @@ public class PedidoController {
     @Autowired
     private EmissaoPedidoService emissaoPedido;
 
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
     @GetMapping
-    public List<PedidoResumoModel> listar() {
-        var pedidos = cadastroPedido.listar();
-        return pedidoResumoAssemble.toCollectionModel(pedidos);
+    public List<PedidoResumoModel> pesquisar(PedidoFilter filtro) {
+        List<Pedido> todosPedidos = pedidoRepository.findAll(PedidoSpecs.usandoFiltro(filtro));
+        return pedidoResumoAssemble.toCollectionModel(todosPedidos);
     }
 
     @GetMapping("/{codigoPedido}")
