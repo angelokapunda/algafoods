@@ -19,7 +19,7 @@ public class CozinhaAssemble {
         return modelMapper.map(cozinha, CozinhaModel.class);
     }
 
-    public List<CozinhaModel> ListToModel(List<Cozinha> cozinhas) {
+    public List<CozinhaModel> toModel(List<Cozinha> cozinhas) {
         return cozinhas.stream().map(this::toModel)
                 .collect(Collectors.toList());
 

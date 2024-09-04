@@ -16,6 +16,10 @@ import com.algawords.algafoods.domain.service.EmissaoPedidoService;
 import com.algawords.algafoods.infra.repository.spec.PedidoSpecs;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,9 +54,17 @@ public class PedidoController {
     private PedidoRepository pedidoRepository;
 
     @GetMapping
-    public List<PedidoResumoModel> pesquisar(PedidoFilter filtro) {
-        List<Pedido> todosPedidos = pedidoRepository.findAll(PedidoSpecs.usandoFiltro(filtro));
-        return pedidoResumoAssemble.toCollectionModel(todosPedidos);
+    public Page<PedidoResumoModel> pesquisar(PedidoFilter filtro, @PageableDefault(sort = "valorTotal") Pageable pageable) {
+        Page<Pedido> pedidosPage = pedidoRepository.findAll(
+                PedidoSpecs.usandoFiltro(filtro), pageable);
+
+        List<PedidoResumoModel> pedidosResumoModel = pedidoResumoAssemble
+                .toCollectionModel(pedidosPage.getContent());
+
+        Page<PedidoResumoModel> pedidosResumoModelPage = new PageImpl<>(
+                pedidosResumoModel, pageable, pedidosPage.getTotalElements());
+
+        return pedidosResumoModelPage;
     }
 
     @GetMapping("/{codigoPedido}")
