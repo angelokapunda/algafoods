@@ -6,6 +6,7 @@ import com.algawords.algafoods.api.assemble.PedidoResumoAssemble;
 import com.algawords.algafoods.api.modelo.PedidoModel;
 import com.algawords.algafoods.api.modelo.PedidoResumoModel;
 import com.algawords.algafoods.api.modelo.input.PedidoInput;
+import com.algawords.algafoods.core.data.PageableTranslator;
 import com.algawords.algafoods.domain.exception.EntidadeNaoEncontradaException;
 import com.algawords.algafoods.domain.exception.NegocioException;
 import com.algawords.algafoods.domain.modelo.Pedido;
@@ -14,7 +15,9 @@ import com.algawords.algafoods.domain.repository.PedidoRepository;
 import com.algawords.algafoods.domain.repository.filter.PedidoFilter;
 import com.algawords.algafoods.domain.service.EmissaoPedidoService;
 import com.algawords.algafoods.infra.repository.spec.PedidoSpecs;
+import com.google.common.collect.ImmutableMap;
 import jakarta.validation.Valid;
+import org.hibernate.metamodel.mapping.internal.ImmutableAttributeMappingList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -55,6 +58,7 @@ public class PedidoController {
 
     @GetMapping
     public Page<PedidoResumoModel> pesquisar(PedidoFilter filtro, @PageableDefault(sort = "valorTotal") Pageable pageable) {
+        pageable = traduzirPageable(pageable);
         Page<Pedido> pedidosPage = pedidoRepository.findAll(
                 PedidoSpecs.usandoFiltro(filtro), pageable);
 
@@ -87,5 +91,15 @@ public class PedidoController {
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
+    }
+
+    private Pageable traduzirPageable(Pageable apiPageable) {
+        var mapeamento = ImmutableMap.of(
+                "codigo", "codigo",
+                "restaurante.nome", "restaurante.nome",
+                "nomeCliente", "cliente.nome",
+                "valorTotal", "valorTotal"
+        );
+        return PageableTranslator.translate(apiPageable, mapeamento);
     }
 }
