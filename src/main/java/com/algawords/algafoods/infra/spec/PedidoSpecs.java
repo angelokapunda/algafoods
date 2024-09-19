@@ -1,8 +1,8 @@
-package com.algawords.algafoods.infra.repository.spec;
+package com.algawords.algafoods.infra.spec;
 
 
 import com.algawords.algafoods.domain.modelo.Pedido;
-import com.algawords.algafoods.domain.repository.filter.PedidoFilter;
+import com.algawords.algafoods.domain.filter.PedidoFilter;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
