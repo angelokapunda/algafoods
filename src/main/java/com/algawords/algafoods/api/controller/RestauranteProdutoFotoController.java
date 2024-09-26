@@ -1,34 +1,50 @@
 package com.algawords.algafoods.api.controller;
 
+import com.algawords.algafoods.api.assemble.FotoProdutoModelAssmble;
+import com.algawords.algafoods.api.modelo.FotoProdutoModel;
 import com.algawords.algafoods.api.modelo.input.FotoProdutoIntput;
+import com.algawords.algafoods.domain.modelo.FotoProduto;
+import com.algawords.algafoods.domain.modelo.Produto;
+import com.algawords.algafoods.domain.service.CadastroProdutoService;
+import com.algawords.algafoods.domain.service.CatalogoFotoProdutoService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/restaurante/{restauranteId}/produtos/{produtoId}/foto")
 public class RestauranteProdutoFotoController {
 
+    @Autowired
+    private CatalogoFotoProdutoService catalogoFotoProduto;
+
+    @Autowired
+    private CadastroProdutoService cadastroProduto;
+
+    @Autowired
+    private FotoProdutoModelAssmble fotoProdutoModelAssmble;
+
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void actualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId, @Valid FotoProdutoIntput fotoProdutoIntput) {
+    public FotoProdutoModel actualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId, @Valid FotoProdutoIntput fotoProdutoIntput) {
 
-        var nomeArquivo = UUID.randomUUID().toString() + "_" + fotoProdutoIntput.getArquivo().getOriginalFilename();
-        var arquivoFoto = Path.of("/home/angelocarlos/Downloads/imagens", nomeArquivo);
+        Produto produto = cadastroProduto.buscarOuFalhar(restauranteId, produtoId);
 
-        System.out.println(fotoProdutoIntput.getDescricao());
-        System.out.println(arquivoFoto);
-        System.out.println(fotoProdutoIntput.getArquivo().getContentType());
+        MultipartFile arquivo = fotoProdutoIntput.getArquivo();
 
-        try {
-            fotoProdutoIntput.getArquivo().transferTo(arquivoFoto);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        FotoProduto foto = new FotoProduto();
+        foto.setProduto(produto);
+        foto.setDescricao(fotoProdutoIntput.getDescricao());
+        foto.setContentType(arquivo.getContentType());
+        foto.setTamanho(arquivo.getSize());
+        foto.setNomeArquivo(arquivo.getOriginalFilename());
+
+        FotoProduto fotoSalva = catalogoFotoProduto.salvar(foto);
+        return fotoProdutoModelAssmble.toModel(fotoSalva);
     }
 }
