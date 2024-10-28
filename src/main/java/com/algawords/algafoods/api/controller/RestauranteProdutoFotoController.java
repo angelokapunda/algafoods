@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping("/restaurante/{restauranteId}/produtos/{produtoId}/foto")
@@ -31,7 +33,8 @@ public class RestauranteProdutoFotoController {
     private FotoProdutoModelAssmble fotoProdutoModelAssmble;
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FotoProdutoModel actualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId, @Valid FotoProdutoIntput fotoProdutoIntput) {
+    public FotoProdutoModel actualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId,
+                                           @Valid FotoProdutoIntput fotoProdutoIntput) throws IOException {
 
         Produto produto = cadastroProduto.buscarOuFalhar(restauranteId, produtoId);
 
@@ -44,7 +47,7 @@ public class RestauranteProdutoFotoController {
         foto.setTamanho(arquivo.getSize());
         foto.setNomeArquivo(arquivo.getOriginalFilename());
 
-        FotoProduto fotoSalva = catalogoFotoProduto.salvar(foto);
+        FotoProduto fotoSalva = catalogoFotoProduto.salvar(foto, arquivo.getInputStream());
         return fotoProdutoModelAssmble.toModel(fotoSalva);
     }
 }
