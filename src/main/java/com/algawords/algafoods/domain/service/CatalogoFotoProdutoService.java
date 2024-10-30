@@ -51,4 +51,13 @@ public class CatalogoFotoProdutoService {
         fotoStorage.substituir(nomeArquivoExistente, novaFoto);
         return foto;
     }
+
+    @Transactional
+    public void excluir (Long restauranteId, Long produtoId) {
+        var foto = buscarOuFalhar(restauranteId, produtoId);
+        produtoRespository.delete(foto);
+        produtoRespository.flush();
+
+        fotoStorage.remover(foto.getNomeArquivo());
+    }
 }
